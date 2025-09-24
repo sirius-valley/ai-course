@@ -14,6 +14,11 @@ const google = createGoogleGenerativeAI({
   },
 });
 
+const MODELS = {
+  'gemini-2.5-flash': google('gemini-2.5-flash'),
+  default: google('gemini-2.5-flash'),
+}
+
 export async function POST(req: NextRequest, { params }: Params) {
   const chatId = (await params).id;
   const { messages: uiMessages }: { messages: UIMessage[] } = await req.json();
@@ -31,9 +36,10 @@ export async function POST(req: NextRequest, { params }: Params) {
 
   // Update the chat with the new messages coming from the UI
   chat.messages = uiMessages;
+
   const result = streamText({
     // model selection
-    model: google('gemini-2.5-flash'),
+    model: MODELS['default'],
     // system prompt
     system,
     // messages
@@ -46,7 +52,6 @@ export async function POST(req: NextRequest, { params }: Params) {
           google: { 
             thinkingConfig: {
               thinkingBudget,
-              includeThoughts: true,
             } 
           },
         }

@@ -40,6 +40,7 @@ async function convertFilesToDataURLs(
 
 export function ChatView({ chat, fetchChats, refreshChat }: { chat: APIChat; fetchChats: () => void; refreshChat: () => Promise<void> }) {
   const [input, setInput] = useState('');
+  const [isSending, setIsSending] = useState<boolean>(false);
   const [files, setFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { messages, sendMessage } = useChat({
@@ -49,6 +50,7 @@ export function ChatView({ chat, fetchChats, refreshChat }: { chat: APIChat; fet
     }),
     messages: chat.messages,
     onFinish: async () => {
+      setIsSending(false);
       await refreshChat();
       fetchChats();
     },
@@ -67,6 +69,7 @@ export function ChatView({ chat, fetchChats, refreshChat }: { chat: APIChat; fet
 
     const fileParts = files.length > 0 ? await convertFilesToDataURLs(files) : [];
 
+    setIsSending(true);
     sendMessage({
       role: 'user',
       parts: [{ type: 'text', text: input }, ...fileParts],
@@ -79,6 +82,14 @@ export function ChatView({ chat, fetchChats, refreshChat }: { chat: APIChat; fet
       fileInputRef.current.value = '';
     }
   }, [sendMessage, input, files]);
+
+  // Auto-resize the input textarea when content changes
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    el.style.height = '0px';
+    el.style.height = `${el.scrollHeight}px`;
+  }, [input]);
 
   return (
     <div className="h-full min-h-0 flex flex-col bg-background">
@@ -135,18 +146,25 @@ export function ChatView({ chat, fetchChats, refreshChat }: { chat: APIChat; fet
           <Textarea
             ref={inputRef}
             rows={1}
-            className="h-11 flex-1 resize-none rounded-full border-border px-4 py-2 bg-background shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="h-11 flex-1 resize-none border-border px-4 py-2 bg-background shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring max-h-48 overflow-y-auto"
             placeholder="Type a message... (Shift+Enter for newline)"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => {
+              setInput(e.target.value);
+              // Immediate resize for better feel while typing
+              const el = e.currentTarget;
+              el.style.height = '0px';
+              el.style.height = `${el.scrollHeight}px`;
+            }}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 submitButtonRef.current?.click();
               }
             }}
+            disabled={isSending}
           />
-          <label className="px-3 py-2 border-border rounded-full cursor-pointer bg-background shadow-sm text-sm">
+          <label className={`px-3 py-2 border-border rounded-full cursor-pointer bg-background shadow-sm text-sm ${isSending ? 'opacity-50 pointer-events-none' : ''}`}>
             <input
               ref={fileInputRef}
               type="file"
@@ -161,10 +179,20 @@ export function ChatView({ chat, fetchChats, refreshChat }: { chat: APIChat; fet
                   e.currentTarget.value = '';
                 }
               }}
+              disabled={isSending}
             />
             Image/PDF
           </label>
-          <Button ref={submitButtonRef} type="submit" className="rounded-full">Send</Button>
+          <Button ref={submitButtonRef} type="submit" className="rounded-full min-w-16" disabled={isSending} aria-busy={isSending}>
+            {isSending ? (
+              <span className="inline-flex items-center gap-2">
+                <span className="h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin" aria-hidden />
+                Sending
+              </span>
+            ) : (
+              'Send'
+            )}
+          </Button>
         </form>
         {files.length > 0 && (
           <div className="max-w-3xl mx-auto mt-2 text-xs opacity-70 flex gap-2 flex-wrap">
