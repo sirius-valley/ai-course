@@ -1,0 +1,26 @@
+{
+  "name": "ai-agents",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npx @langchain/langgraph-cli dev"
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@langchain/core": "^0.3.78",
+    "@langchain/langgraph": "^0.4.9",
+    "@langchain/langgraph-checkpoint-sqlite": "^0.1.0",
+    "@langchain/mcp-adapters": "^0.6.0",
+    "@langchain/openai": "0.6.14",
+    "dotenv": "^16.4.5",
+    "zod": "3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "typescript": "^5.6.3"
+  }
+}
