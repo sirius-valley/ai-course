@@ -1,0 +1,10 @@
+{
+  "node_version": "20",
+  "dockerfile_lines": [],
+  "dependencies": ["."],
+  "graphs": {
+    "calculator": "./src/calculator/graph.ts:createGraph",
+    "mcp": "./src/mcp/graph.ts:createGraph"
+  },
+  "env": ".env"
+}
