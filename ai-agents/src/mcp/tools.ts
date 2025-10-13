@@ -15,7 +15,7 @@ const client = new MultiServerMCPClient({
     },
     airbnb: {
       command: "npx",
-      args: ["-y", "@openbnb/mcp-server-airbnb"],
+      args: ["-y", "@openbnb/mcp-server-airbnb", "--ignore-robots-txt"],
     },
   },
 });
