@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, HarmBlockThreshold, HarmCategory } from "@google/genai";
 import {
   BlogGenerationStateType,
   ImageGenerationStateType,
@@ -21,6 +21,13 @@ export const googleImageGenerationNode = async (
       model: "gemini-2.5-flash-image",
       contents: `Generate an image for the following caption: ${state.imageCaption}`,
       config: {
+        safetySettings: [
+          {
+            category: HarmCategory.HARM_CATEGORY_IMAGE_SEXUALLY_EXPLICIT,
+            threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+          },
+        ],
+        // seed: 42,
         imageConfig: {
           aspectRatio: "16:9",
         },
@@ -52,7 +59,10 @@ export const googleImageGenerationNode = async (
       }
     }
 
-    console.log('failed image parts', JSON.stringify(response.candidates[0].content.parts, null, 2));
+    console.log(
+      "failed image parts",
+      JSON.stringify(response.candidates[0].content.parts, null, 2)
+    );
 
     console.error(
       `✗ Failed to generate image for section ${state.sectionIndex + 1}`
@@ -112,6 +122,10 @@ export const tencentImageGenerationNode = async (
   const input = {
     prompt: state.imageCaption,
     aspect_ratio: "16:9",
+    // output_quality: 90,
+    // seed: 42,
+    // go_fast: true,
+    // disable_safety_checker: true,
   };
 
   const output = await replicate.run("tencent/hunyuan-image-3", { input });
@@ -151,6 +165,18 @@ export const editImage = async (
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash-image",
     contents: promptContents,
+    config: {
+      safetySettings: [
+        {
+          category: HarmCategory.HARM_CATEGORY_IMAGE_SEXUALLY_EXPLICIT,
+          threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+        },
+      ],
+      // seed: 42,
+      imageConfig: {
+        aspectRatio: "16:9",
+      },
+    },
   });
 
   if (!response.candidates?.[0]?.content?.parts) {
