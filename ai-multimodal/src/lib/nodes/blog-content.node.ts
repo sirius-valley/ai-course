@@ -28,7 +28,7 @@ const BlogSectionSchema = z.object({
 
 export const BlogPostSchema = z.object({
   title: z.string().describe("An engaging, SEO-friendly title for the blog post"),
-  sections: z.array(BlogSectionSchema).min(3).max(10).describe("Array of text and image sections"),
+  sections: z.array(BlogSectionSchema).min(3).max(20).describe("Array of text and image sections"),
 });
 
 export const createBlogNode = async (state: BlogGenerationStateType): Promise<Partial<BlogGenerationStateType>> => {

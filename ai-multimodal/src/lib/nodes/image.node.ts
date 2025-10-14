@@ -19,7 +19,7 @@ export const googleImageGenerationNode = async (
   try {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash-image",
-      contents: state.imageCaption,
+      contents: `Generate an image for the following caption: ${state.imageCaption}`,
       config: {
         imageConfig: {
           aspectRatio: "16:9",
@@ -51,6 +51,8 @@ export const googleImageGenerationNode = async (
         };
       }
     }
+
+    console.log('failed image parts', JSON.stringify(response.candidates[0].content.parts, null, 2));
 
     console.error(
       `✗ Failed to generate image for section ${state.sectionIndex + 1}`

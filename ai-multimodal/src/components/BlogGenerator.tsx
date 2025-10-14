@@ -127,6 +127,7 @@ export const BlogGenerator = () => {
             state.audioUrl = post.audioUrl;
             
             setBlogPost({
+              id: post.id,
               title: post.title,
               sections: post.sections,
               summary: post.summary,
@@ -276,24 +277,6 @@ export const BlogGenerator = () => {
           }
         }
 
-        setTopic('');
-      } else {
-        // Fallback to JSON response (shouldn't happen with new implementation)
-        const data = await response.json();
-        
-        if (data.error) {
-          throw new Error(data.error);
-        }
-
-        setBlogPost(data.blogPost);
-        setHistory(prev => [{
-          id: data.id,
-          topic: topic.trim(),
-          blogPost: data.blogPost,
-          timestamp: new Date(),
-          threadId: data.threadId,
-        }, ...prev]);
-        
         setTopic('');
       }
     } catch (err) {
