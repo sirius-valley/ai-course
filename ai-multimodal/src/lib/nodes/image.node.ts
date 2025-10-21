@@ -21,13 +21,13 @@ export const googleImageGenerationNode = async (
       model: "gemini-2.5-flash-image",
       contents: `Generate an image for the following caption: ${state.imageCaption}`,
       config: {
-        safetySettings: [
-          {
-            category: HarmCategory.HARM_CATEGORY_IMAGE_SEXUALLY_EXPLICIT,
-            threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
-          },
-        ],
-        // seed: 42,
+        // safetySettings: [
+        //   {
+        //     category: HarmCategory.HARM_CATEGORY_IMAGE_SEXUALLY_EXPLICIT,
+        //     threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+        //   },
+        // ],
+        seed: 42,
         imageConfig: {
           aspectRatio: "16:9",
         },
@@ -122,15 +122,15 @@ export const tencentImageGenerationNode = async (
   const input = {
     prompt: state.imageCaption,
     aspect_ratio: "16:9",
-    // output_quality: 90,
     // seed: 42,
+    // output_quality: 95,
     // go_fast: true,
-    // disable_safety_checker: true,
+    // disable_safety_checker: false,
   };
 
   const output = await replicate.run("tencent/hunyuan-image-3", { input });
 
-  const image = await fetch((output as any)[0]?.url());
+  const image = await fetch((output as unknown as { url: () => string }[])[0]?.url());
   const imageBuffer = await image.arrayBuffer();
   const base64Image = Buffer.from(imageBuffer).toString("base64");
   const imageUrl = `data:image/png;base64,${base64Image}`;
@@ -166,12 +166,12 @@ export const editImage = async (
     model: "gemini-2.5-flash-image",
     contents: promptContents,
     config: {
-      safetySettings: [
-        {
-          category: HarmCategory.HARM_CATEGORY_IMAGE_SEXUALLY_EXPLICIT,
-          threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
-        },
-      ],
+      // safetySettings: [
+      //   {
+      //     category: HarmCategory.HARM_CATEGORY_IMAGE_SEXUALLY_EXPLICIT,
+      //     threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+      //   },
+      // ],
       // seed: 42,
       imageConfig: {
         aspectRatio: "16:9",

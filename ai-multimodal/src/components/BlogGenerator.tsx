@@ -79,7 +79,7 @@ export const BlogGenerator = () => {
   };
 
   const createEventHandlers = (currentTopic: string) => ({
-    blogPost: (eventData: any, state: StreamState) => {
+    blogPost: (eventData: { data: BlogPost }, state: StreamState) => {
       state.partialBlogPost = eventData.data as BlogPost;
       if (state.partialBlogPost?.title && state.partialBlogPost?.sections) {
         setBlogPost(createBlogPostUpdate(state, { summary: undefined, audioUrl: undefined }));
@@ -87,7 +87,7 @@ export const BlogGenerator = () => {
       }
     },
 
-    summary: (eventData: any, state: StreamState) => {
+    summary: (eventData: { data: string }, state: StreamState) => {
       state.summary = eventData.data;
       setIsLoadingSummary(false);
       if (state.partialBlogPost) {
@@ -96,30 +96,27 @@ export const BlogGenerator = () => {
       }
     },
 
-    audioReady: (eventData: any, state: StreamState) => {
+    audioReady: (eventData: { data: { audioUrl: string } }, state: StreamState) => {
       state.audioReady = true;
       state.audioUrl = eventData.data.audioUrl;
     },
 
-    collectImages: (eventData: any, state: StreamState) => {
+    collectImages: (_eventData: unknown, _state: StreamState) => {
       // Base64 images are too large to send via SSE
       // They will be saved to the database and loaded when the post is complete
       console.log('✅ Images processed and saved to database');
     },
 
-    complete: async (eventData: any, state: StreamState) => {
+    complete: async (eventData: { data: { id: string; threadId: string } }, state: StreamState) => {
       state.postId = eventData.data.id;
       state.threadId = eventData.data.threadId;
-      const hasAudio = eventData.data.hasAudio;
 
-      // Fetch the complete blog post from the database (includes images with base64 URLs)
       if (state.postId) {
         try {
           const postResponse = await fetch(`/api/blog/posts/${state.postId}`);
           if (postResponse.ok) {
             const { post } = await postResponse.json();
             
-            // Update state with the complete blog post including images
             state.partialBlogPost = {
               title: post.title,
               sections: post.sections,
@@ -162,7 +159,7 @@ export const BlogGenerator = () => {
       console.log('✅ Generation complete');
     },
 
-    error: (eventData: any) => {
+    error: (eventData: { data: string }) => {
       throw new Error(eventData.data);
     },
   });

@@ -22,7 +22,6 @@ export interface BlogSection {
 const BlogSectionSchema = z.object({
   type: z.enum(["text", "image"]),
   content: z.string().describe("The main content or caption. For text sections use plain text, not markdown"),
-  imageUrl: z.string().nullable().optional().describe("URL of the image (null for placeholders)"),
   imageAlt: z.string().nullable().optional().describe("Alt text for the image"),
 });
 
@@ -33,7 +32,6 @@ export const BlogPostSchema = z.object({
 
 export const createBlogNode = async (state: BlogGenerationStateType): Promise<Partial<BlogGenerationStateType>> => {
   try {
-    // Initialize Tavily search tool
     const tavilyTool = new TavilySearch();
 
     const llm = new ChatOpenAI({
@@ -51,10 +49,9 @@ export const createBlogNode = async (state: BlogGenerationStateType): Promise<Pa
       - Create an engaging, SEO-friendly title
       - Include 3-5 sections mixing text and image placeholders
       - For text sections: Write rich, informative content with proper paragraphs based on your research
-      - For image sections: Provide descriptive captions and alt text, but set imageUrl to null (NOT an empty string)
+      - For image sections: Provide descriptive captions and alt text
       - Structure: Introduction → Body (with images) → Conclusion
       - Make content valuable and well-researched
-      - IMPORTANT: For image sections, imageUrl MUST be null (not undefined, not empty string, but explicitly null)
       
       After researching, provide the complete blog post content that will be structured.
     `;
