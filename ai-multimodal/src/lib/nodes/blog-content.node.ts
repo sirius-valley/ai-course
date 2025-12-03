@@ -1,4 +1,4 @@
-import z, { nullable } from "zod";
+import z from "zod";
 import { BlogGenerationStateType } from "../node-state";
 import { ChatOpenAI } from "@langchain/openai";
 import { TavilySearch } from "@langchain/tavily";

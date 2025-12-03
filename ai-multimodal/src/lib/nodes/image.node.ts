@@ -19,7 +19,9 @@ export const googleImageGenerationNode = async (
   try {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash-image",
-      contents: `Generate an image for the following caption: ${state.imageCaption}`,
+      contents: `Generate an image for the following blogpost section:
+       General blog title: ${state.topic}
+       Image Caption: ${state.imageCaption}`,
       config: {
         // safetySettings: [
         //   {
@@ -120,7 +122,9 @@ export const tencentImageGenerationNode = async (
   const replicate = new Replicate();
 
   const input = {
-    prompt: state.imageCaption,
+    prompt: `Generate an image for the following blogpost section:
+       General blog title: ${state.topic}
+       Image Caption: ${state.imageCaption}`,
     aspect_ratio: "16:9",
     // seed: 42,
     // output_quality: 95,
